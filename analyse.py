@@ -89,6 +89,8 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
     lineage=''
     if 'pango_lineage_usher' in node['node_attrs']:
         lineage=node['node_attrs']['pango_lineage_usher']['value']
+    else:
+        lineage=current_lineage
     is_terminal_lineage=True
     if lineage=='':
         is_terminal_lineage=False
@@ -112,16 +114,22 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
     
     if lineage in variant_mutation_dic:
         designated_mutations=variant_mutation_dic[lineage]
-    for item in mut:
+    lineage_ref=ref
+    for item in designated_mutations:
+        ids=int(item[1:-1])
+        lineage_ref=lineage_ref[:ids-1]+item[-1]+lineage_ref[ids:]
+    i=0
+    while (i<len(mut)):
+        item=mut[i]
         ids=int(item[1:-1])
         this_seq=this_seq[:ids-1]+item[-1]+this_seq[ids:]
-        
-        if item[-1]!=ref[ids-1]:
+        #if (lineage=='JN.1.7'):
+        #   print(item,ids)
+        if (item[-1]!=ref[ids-1]):
             # ignore reversions
             # check if S or Orf9b
-            absolute_mute=ref[ids-1]+str(ids)+item[-1]
-            del_mute=ref[ids-1]+str(ids)+'-'
-            if not(absolute_mute in designated_mutations or del_mute in designated_mutations):
+           
+            if (item[-1]!=lineage_ref[ids-1]) and (lineage_ref[ids-1]!='-'):
                 for annoitem in anno:
                     if 'start' in anno[annoitem]:
                         
@@ -137,10 +145,18 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
             else:
                 
                 mut.remove(item)
+                i-=1
         else:
-            back_mutation_count+=1
+            # if the position is not already reverted in designated
+            if lineage_ref[ids-1]!=ref[ids-1] and lineage_ref[ids-1]!='-':
+                back_mutation_count+=1
+            else:
+                mut.remove(item)
+                i-=1
+        i+=1
         
-    
+    #if lineage=='JN.1.7':
+    #    print("show off:", current_mut, mut)
     current_mut.extend(mut)
 
 
@@ -148,7 +164,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
         count+=1
         #print(node['name'],count)
         if back_mutation_count>5:
-            print(lineage,node['name'])
+            print(lineage,node['name'],current_mut)
         
     else:
         if 'children' in node:
@@ -156,9 +172,11 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
                 ret_info=node_browser(child,lineage,this_seq,current_mut,back_mutation_count)
                 if ret_info[0]!=lineage:
                     is_terminal_lineage=False
+                    
                 count+=ret_info[1]
             #print(node['name'],important_mut)
-        
+    if not(is_terminal_lineage):
+        lineage='not terminal'
     if important_mut:
         if is_terminal_lineage:
             if count>=important_threshold:
