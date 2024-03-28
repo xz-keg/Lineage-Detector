@@ -89,8 +89,7 @@ table=read_table()
 #m=split_ref(ref,table)
 import copy
 def highlight_browser(node):
-    node['node_attrs']['hightlight']={}
-    node['node_attrs']['hightlight']['value']='Yes'
+    node['node_attrs']['userOrOld']['value']='highlighted sample'
     if 'children' in node:
         for child in node['children']:
             highlight_browser(child)
@@ -272,8 +271,8 @@ f=open(filename+".json",'r')
 js=json.load(f)
 f.close()
 anno=js['meta']['genome_annotations']
+js['meta']['colorings'][0]['scale'].append(['highlighted sample','#CCCC00'])
 
-#print(anno)
 anno['ORF1a']=anno['ORF1ab']['segments'][0]
 anno['ORF1b']=anno['ORF1ab']['segments'][1]
 anno['ORF9b']={'start':28284,'end':28577}
