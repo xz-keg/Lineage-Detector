@@ -4,12 +4,15 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Demo of argparse')
 parser.add_argument('--filename', type=str,default='usher')
-parser.add_argument('--important-threshold', type=int,default=2)
-
+parser.add_argument('--important-threshold', type=int,default=3)
+parser.add_argument('--important-ct-threshold', type=int,default=2)
+parser.add_argument('--output-highlighted', type=bool,default=False)
 
 args = parser.parse_args()
 important_threshold=args.important_threshold
+important_country=args.important_ct_threshold
 filename=args.filename
+opt=args.output_highlighted
 
 def read_ref():
     ref=open("reference_seq.txt",'r')
@@ -85,6 +88,13 @@ for i in range(len(ref)):
 table=read_table()
 #m=split_ref(ref,table)
 import copy
+def highlight_browser(node):
+    node['node_attrs']['hightlight']={}
+    node['node_attrs']['hightlight']['value']='Yes'
+    if 'children' in node:
+        for child in node['children']:
+            highlight_browser(child)
+    return 0
 def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
     lineage=''
     if 'pango_lineage_usher' in node['node_attrs']:
@@ -159,12 +169,20 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
     #    print("show off:", current_mut, mut)
     current_mut.extend(mut)
 
-
+    country_list=[]
+    date_list=[]
     if 'hCoV' in node['name']:
         count+=1
         #print(node['name'],count)
         if back_mutation_count>5:
             print(lineage,node['name'],current_mut)
+        ct=node['name'].split('/')[1]
+        if not(ct in country_list):
+            country_list.append(ct)
+        if 'GBW' in node['name']:
+            country_list.append('GBW')
+        date=node['name'].split('|')[-1]
+        date_list.append(date)
         
     else:
         if 'children' in node:
@@ -174,12 +192,19 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
                     is_terminal_lineage=False
                     
                 count+=ret_info[1]
+                for ct in ret_info[2]:
+                    if not(ct in country_list):
+                        country_list.append(ct)
+                if len(date_list)<=1:
+                    for ct in ret_info[3]:
+                        if not(ct in date_list):
+                            date_list.append(ct)
             #print(node['name'],important_mut)
     if not(is_terminal_lineage):
         lineage='not terminal'
     if important_mut:
         if is_terminal_lineage:
-            if count>=important_threshold:
+            if (count>=important_threshold or (len(country_list)>=important_country and count>=2 and len(date_list)>=2) ):
                 imp_mut=[]
                 for item in current_mut:
                     ids=int(item[1:-1])
@@ -199,8 +224,9 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
                                         muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3)+1)+aa
                                         imp_mut.append(muta)
                 if len(imp_mut)>0:
-                    print(node['name'],lineage,','.join(current_mut),count,imp_mut)
-    return [lineage,count]
+                    print(node['name'],lineage,','.join(current_mut),count,len(country_list),imp_mut)
+                w=highlight_browser(node)
+    return [lineage,count,copy.deepcopy(country_list),copy.deepcopy(date_list)]
 
 variant_mutation_dic={}
 
@@ -244,7 +270,9 @@ read_designation()
 
 f=open(filename+".json",'r')
 js=json.load(f)
+f.close()
 anno=js['meta']['genome_annotations']
+
 #print(anno)
 anno['ORF1a']=anno['ORF1ab']['segments'][0]
 anno['ORF1b']=anno['ORF1ab']['segments'][1]
@@ -257,7 +285,10 @@ tree=js['tree']
 
 root=tree['children'][0]
 
-l,count=node_browser(root,'',ref,[],0)
+l,count,countries,dates=node_browser(root,'',ref,[],0)
+outjs=open(filename+".json",'w')
+json.dump(js,outjs)
+
 '''
 while 'children' in node_main:
     max_length=0
