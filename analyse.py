@@ -89,7 +89,8 @@ table=read_table()
 #m=split_ref(ref,table)
 import copy
 def highlight_browser(node):
-    node['node_attrs']['userOrOld']['value']='highlighted sample'
+    if 'userOrOld' in node['node_attrs']:
+        node['node_attrs']['userOrOld']['value']='highlighted sample'
     if 'children' in node:
         for child in node['children']:
             highlight_browser(child)
@@ -173,8 +174,10 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
     if 'hCoV' in node['name']:
         count+=1
         #print(node['name'],count)
-        if back_mutation_count>5:
+        if back_mutation_count>=5:
             print(lineage,node['name'],current_mut)
+            w=highlight_browser(node)
+
         ct=node['name'].split('/')[1]
         if not(ct in country_list):
             country_list.append(ct)
