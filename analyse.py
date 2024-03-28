@@ -109,7 +109,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
     #print("branch attr:",node['branch_attrs'])
     mut=[]
     if 'branch_attrs' in node:
-        mut=node['branch_attrs']['mutations']['nuc']
+        mut=copy.deepcopy(node['branch_attrs']['mutations']['nuc'])
     this_seq=current_seq
     important_mut=False
    
