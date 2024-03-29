@@ -227,7 +227,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
                                         imp_mut.append(muta)
                 if len(imp_mut)>0:
                     print(node['name'],lineage,','.join(current_mut),count,len(country_list),imp_mut)
-                w=highlight_browser(node)
+                    w=highlight_browser(node)
     return [lineage,count,copy.deepcopy(country_list),copy.deepcopy(date_list)]
 
 variant_mutation_dic={}
