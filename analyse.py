@@ -86,7 +86,7 @@ for i in range(len(ref)):
 
 
 table=read_table()
-#m=split_ref(ref,table)
+m=split_ref(ref,table)
 import copy
 def highlight_browser(node):
     if 'userOrOld' in node['node_attrs']:
@@ -281,6 +281,10 @@ anno['ORF1b']=anno['ORF1ab']['segments'][1]
 anno['ORF9b']={'start':28284,'end':28577}
 anno['ORF9c']={'start':28734,'end':28955}
 anno['ORF3c']={'start':25457,'end':25582}
+anno['ORF3b']={'start':25814,'end':25882}
+anno['ORF3d']={'start':25524,'end':25697}
+anno['ORF3d-2']={'start':25968,'end':26069}
+anno['ORF0']={'start':107,'end':136}
 
 tree=js['tree']
 
