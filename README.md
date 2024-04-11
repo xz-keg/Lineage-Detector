@@ -27,8 +27,13 @@ Packages required:
 
 Add highlighted lineage features to highlight samples with too many reversions, branches with additional undesignated Spike or Orf9b mutation, or branches with early stop signal/start codon destroyed. 
 
-Example link to view: 
+Example link to view important seqs on the most recent uploads: 
+
 https://nextstrain.org/fetch/raw.githubusercontent.com/aviczhl2/usher_analyse_tool/main/usher-2.json?branchLabel=Spike%20mutations&f_userOrOld=highlighted%20sample
+
+https://nextstrain.org/fetch/raw.githubusercontent.com/aviczhl2/usher_analyse_tool/main/usher-3.json?branchLabel=Spike%20mutations&f_userOrOld=highlighted%20sample
+
+https://nextstrain.org/fetch/raw.githubusercontent.com/aviczhl2/usher_analyse_tool/main/usher-4.json?branchLabel=Spike%20mutations&f_userOrOld=highlighted%20sample
 
 
 
