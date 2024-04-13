@@ -86,7 +86,7 @@ for i in range(len(ref)):
 
 
 table=read_table()
-m=split_ref(ref,table)
+#m=split_ref(ref,table)
 import copy
 def highlight_browser(node):
     if 'userOrOld' in node['node_attrs']:
