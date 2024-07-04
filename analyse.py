@@ -13,6 +13,7 @@ important_threshold=args.important_threshold
 important_country=args.important_ct_threshold
 filename=args.filename
 opt=args.output_highlighted
+deweighted_countries=["england",'scotland','wales','canada']
 
 def read_ref():
     ref=open("reference_seq.txt",'r')
@@ -206,6 +207,9 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
         lineage='not terminal'
     if important_mut:
         if is_terminal_lineage:
+            if len(country_list)==1:
+                if country_list[0] in deweighted_countries:     #ignore groups from uk and canada.
+                    count=count*0.5
             if (count>=important_threshold or (len(country_list)>=important_country and count>=2 and len(date_list)>=2) ):
                 imp_mut=[]
                 for item in current_mut:
