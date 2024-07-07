@@ -208,7 +208,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
     if important_mut:
         if is_terminal_lineage:
             if len(country_list)==1:
-                if country_list[0] in deweighted_countries:     #ignore groups from uk and canada.
+                if country_list[0].lower().strip() in deweighted_countries:     #ignore groups from uk and canada.
                     count=count*0.5
             if (count>=important_threshold or (len(country_list)>=important_country and count>=2 and len(date_list)>=2) ):
                 imp_mut=[]
