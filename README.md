@@ -33,7 +33,7 @@ Currently updating every 3 days.
 https://nextstrain.org/fetch/raw.githubusercontent.com/aviczhl2/usher_analyse_tool/main/date-num.json?branchLabel=Spike%20mutations&f_userOrOld=highlighted%20sample
 
 Example for seqs 0-1000 at 7-10(referring to 7-6~7-9 seqs on GISAID)：
-https://nextstrain.org/fetch/raw.githubusercontent.com/aviczhl2/usher_analyse_tool/main/7-10-1.json?branchLabel=Spike%20mutations&f_userOrOld=highlighted%20sample
+https://nextstrain.org/fetch/raw.githubusercontent.com/aviczhl2/usher_analyse_tool/main/2024-7-10-1.json?branchLabel=Spike%20mutations&f_userOrOld=highlighted%20sample
 
 
 
