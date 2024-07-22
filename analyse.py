@@ -136,6 +136,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
         this_seq=this_seq[:ids-1]+item[-1]+this_seq[ids:]
         #if (lineage=='JN.1.7'):
         #   print(item,ids)
+        n_glycan=False
         if (item[-1]!=ref[ids-1]):
             # ignore reversions
             # check if S or Orf9b
@@ -153,6 +154,21 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
                                 # credible mutations: mutations on S, Orf9b, Orf9c, normal to O, or M to others
                                 if (annoitem in ['S','ORF9b']) or (aa=='O') or (nuc_st==start):
                                     important_mut=True
+                                    if annoitem=='S':
+                                        
+                                        aa_1=table[current_seq[nuc_st-4:nuc_st-1]]
+                                        aa_2=table[current_seq[nuc_st-7:nuc_st-4]]
+                                        aa_n1=table[current_seq[nuc_st+2:nuc_st+5]]
+                                        aa_n2=table[current_seq[nuc_st+5:nuc_st+8]]
+                                        if aa_2=='N' and aa_1!='P' and (aa in ['S','T'] and not(old_aa in ['S','T'])):
+                                            n_glycan=True
+                                        if aa_1=='N' and old_aa=='P' and aa_n1 in ['S','T']:
+                                            n_glycan=True
+                                        if aa=='N' and aa_n1!='P' and aa_n2 in ['S','T']:
+                                            n_glycan=True
+                                        
+
+
             else:
                 
                 mut.remove(item)
@@ -210,7 +226,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
             if len(country_list)==1:
                 if country_list[0].lower().strip() in deweighted_countries:     #ignore groups from uk and canada.
                     count=count*0.5
-            if (count>=important_threshold or (len(country_list)>=important_country and count>=2 and len(date_list)>=2) ):
+            if (count>=important_threshold or (len(country_list)>=important_country and count>=2 and len(date_list)>=2) or (count>=2 and n_glycan)):
                 imp_mut=[]
                 for item in current_mut:
                     ids=int(item[1:-1])
@@ -230,7 +246,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
                                         muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3)+1)+aa
                                         imp_mut.append(muta)
                 if len(imp_mut)>0:
-                    print(node['name'],lineage,','.join(current_mut),count,len(country_list),imp_mut)
+                    print(node['name'],lineage,','.join(current_mut),count,len(country_list),imp_mut,n_glycan)
                     w=highlight_browser(node)
     return [lineage,count,copy.deepcopy(country_list),copy.deepcopy(date_list)]
 
