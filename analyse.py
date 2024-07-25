@@ -155,11 +155,22 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
                                 if (annoitem in ['S','ORF9b']) or (aa=='O') or (nuc_st==start):
                                     important_mut=True
                                     if annoitem=='S':
-                                        
-                                        aa_1=table[current_seq[nuc_st-4:nuc_st-1]]
-                                        aa_2=table[current_seq[nuc_st-7:nuc_st-4]]
-                                        aa_n1=table[current_seq[nuc_st+2:nuc_st+5]]
-                                        aa_n2=table[current_seq[nuc_st+5:nuc_st+8]]
+                                        new_start=nuc_st-4
+                                        while current_seq[new_start]=='-':
+                                            new_start-=3
+                                        aa_1=table[current_seq[new_start:new_start+3]]
+                                        new_start-=3
+                                        while current_seq[new_start]=='-':
+                                            new_start-=3
+                                        aa_2=table[current_seq[new_start:new_start+3]]
+                                        new_start=nuc_st+2
+                                        while current_seq[new_start]=='-':
+                                            new_start+=3
+                                        aa_n1=table[current_seq[new_start:new_start+3]]
+                                        new_start+=3
+                                        while current_seq[new_start]=='-':
+                                            new_start+=3
+                                        aa_n2=table[current_seq[new_start:new_start+3]]
                                         if aa_2=='N' and aa_1!='P' and (aa in ['S','T'] and not(old_aa in ['S','T'])):
                                             n_glycan=True
                                         if aa_1=='N' and old_aa=='P' and aa_n1 in ['S','T']:
