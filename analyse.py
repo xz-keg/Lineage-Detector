@@ -130,13 +130,14 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
         ids=int(item[1:-1])
         lineage_ref=lineage_ref[:ids-1]+item[-1]+lineage_ref[ids:]
     i=0
+    n_glycan=False
     while (i<len(mut)):
         item=mut[i]
         ids=int(item[1:-1])
         this_seq=this_seq[:ids-1]+item[-1]+this_seq[ids:]
         #if (lineage=='JN.1.7'):
         #   print(item,ids)
-        n_glycan=False
+   
         if (item[-1]!=ref[ids-1]):
             # ignore reversions
             # check if S or Orf9b
@@ -148,36 +149,35 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
                         if ids>=anno[annoitem]['start'] and ids<=anno[annoitem]['end']:
                             start=anno[annoitem]['start']
                             nuc_st=ids-(ids-start)%3
-                            aa=table[current_seq[nuc_st-1:nuc_st+2]]
-                            old_aa=table[this_seq[nuc_st-1:nuc_st+2]]
+                            old_aa=table[current_seq[nuc_st-1:nuc_st+2]]
+                            aa=table[this_seq[nuc_st-1:nuc_st+2]]
                             if aa!=old_aa:
                                 # credible mutations: mutations on S, Orf9b, Orf9c, normal to O, or M to others
                                 if (annoitem in ['S','ORF9b']) or (aa=='O') or (nuc_st==start):
                                     important_mut=True
-                                    if annoitem=='S':
-                                        new_start=nuc_st-4
-                                        while current_seq[new_start]=='-':
-                                            new_start-=3
-                                        aa_1=table[current_seq[new_start:new_start+3]]
-                                        new_start-=3
-                                        while current_seq[new_start]=='-':
-                                            new_start-=3
-                                        aa_2=table[current_seq[new_start:new_start+3]]
-                                        new_start=nuc_st+2
-                                        while current_seq[new_start]=='-':
-                                            new_start+=3
-                                        aa_n1=table[current_seq[new_start:new_start+3]]
-                                        new_start+=3
-                                        while current_seq[new_start]=='-':
-                                            new_start+=3
-                                        aa_n2=table[current_seq[new_start:new_start+3]]
+                                    if annoitem=='S' and not(n_glycan):
+                                        pot=20
+                                        local_ref=lineage_ref[nuc_st-21:nuc_st+21]
+                                        ii=0
+                                        while ii<len(local_ref):
+                                            if local_ref[ii]!='-':
+                                                ii+=1
+                                            else:
+                                                local_ref=local_ref[:ii]+local_ref[ii+1:]
+                                                if ii<pot:
+                                                    pot-=1
+                                                                                
+                                        aa_1=table[local_ref[pot-3:pot]]                                
+                                        aa_2=table[local_ref[pot-6:pot-3]]
+                                        aa_n1=table[local_ref[pot+3:pot+6]]
+                                        aa_n2=table[local_ref[pot+6:pot+9]]
                                         if aa_2=='N' and aa_1!='P' and (aa in ['S','T'] and not(old_aa in ['S','T'])):
                                             n_glycan=True
                                         if aa_1=='N' and old_aa=='P' and aa_n1 in ['S','T']:
                                             n_glycan=True
                                         if aa=='N' and aa_n1!='P' and aa_n2 in ['S','T']:
                                             n_glycan=True
-                                        
+                                                    
 
 
             else:
