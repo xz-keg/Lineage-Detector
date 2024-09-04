@@ -156,8 +156,8 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
                                 if (annoitem in ['S','ORF9b']) or (aa=='O') or (nuc_st==start):
                                     important_mut=True
                                     if annoitem=='S' and not(n_glycan):
-                                        pot=20
-                                        local_ref=lineage_ref[nuc_st-21:nuc_st+21]
+                                        pot=40
+                                        local_ref=lineage_ref[nuc_st-41:nuc_st+21]
                                         ii=0
                                         while ii<len(local_ref):
                                             if local_ref[ii]!='-':
