@@ -1,5 +1,5 @@
 import json
-
+import os
 import argparse
 
 parser = argparse.ArgumentParser(description='Demo of argparse')
@@ -108,14 +108,17 @@ def read_tsv():
 	
 def search_tsv(name):
 	ans=[]
-	for l in tsvlines[1:]:
-		linsp=l.split("\t")
-		exmut=[]
-		if name ==linsp[0]:			
-			insertion=linsp[10]
-			deletion=linsp[12].split(", ")
-			masked=linsp[13].split(",")
-			return [insertion,deletion,masked]
+	if len(tsvlines)>0:
+		for l in tsvlines[1:]:
+			linsp=l.split("\t")
+			exmut=[]
+			if name ==linsp[0]:			
+				insertion=linsp[10]
+				deletion=linsp[12].split(", ")
+				masked=linsp[13].split(",")
+				return [insertion,deletion,masked]
+	else:
+		return[[],[],[]]
 	 
 
 import copy
@@ -254,7 +257,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 					i-=1
 				else:
 					exmut.append("del"+item.split(":")[0])
-				i+=1	
+			i+=1	
 		i=0
 		while (i<len(masked)):
 			item=masked[i]
@@ -307,16 +310,18 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 	if not(is_terminal_lineage):
 		lineage='not terminal'
 	for m in list(exmut_list):
-		if m[0]=="d":
-			for annoitem in anno:
-				if int(m[3:].split("-")[1])>=anno['S']['start'] and int(m[3:].split("-")[0])<=anno['S']['start']:
-						important_mut = True
-				if int(m[3:].split("-")[1])>=anno['S']['end'] and int(m[3:].split("-")[0])<=anno['S']['end']:
-						important_mut = True
-			if int(m[3:].split("-")[1])>=anno['S']['start'] or int(m[3:].split("-")[0])<=anno['S']['end']:
-						important_mut = True
-			if int(m[3:].split("-")[1])>=anno['ORF9b']['start'] or int(m[3:].split("-")[0])<=anno['ORF9b']['end']:
-						important_mut = True
+		if exmut_list[m]>=2:
+			if m[0]=="d":
+				for annoitem in anno:
+					if ('start' in anno[annoitem]) and (annoitem!='nuc'):
+						if int(m[3:].split("-")[1])>=anno[annoitem]['start'] and int(m[3:].split("-")[0])<=anno[annoitem]['start']:
+								important_mut = True
+						if int(m[3:].split("-")[1])>=anno[annoitem]['end'] and int(m[3:].split("-")[0])<=anno[annoitem]['end']:
+								important_mut = True
+				if int(m[3:].split("-")[1])>=anno['S']['start'] or int(m[3:].split("-")[0])<=anno['S']['end']:
+							important_mut = True
+				if int(m[3:].split("-")[1])>=anno['ORF9b']['start'] or int(m[3:].split("-")[0])<=anno['ORF9b']['end']:
+							important_mut = True
 	if important_mut:
 		if is_terminal_lineage:
 			if len(country_list)==1:
@@ -344,24 +349,58 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 											imp_mut.append(muta)
 				for item in list(exmut_list):
 					if item[0]=="d":
-						ids=int(item[3:].split("-")[0])
-						ide=int(item[3:].split("-")[1])
 						for annoitem in anno:
-							if ('start' in anno[annoitem]) and (annoitem!='nuc') and (this_seq[ids-1]==item[-1]):
-								if ids>=anno[annoitem]['start'] and ids<=anno[annoitem]['end']:
-									#print(item,annoitem,this_seq[ids-1])
-									start=anno[annoitem]['start']
-									nuc_st=ids-(ids-start)%3
-									nuc_en=ide-(ide-start)%3
-									old_aa=table[ref[nuc_st-1:nuc_en+2]]
-									aa=table[this_seq[nuc_st-1:nuc_en+2]]									
-									#print(old_aa,aa)
-									if aa!=old_aa:
-										# credible mutations: mutations on S, Orf9b, Orf9c, normal to O, or M to others
-										if (annoitem in ['S','ORF9b']) or (aa=='O') or (nuc_st<=start and nuc_en>=start):
-											muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3)+1)+aa
-											if muta not in imp_mut:
-												imp_mut.append(muta)
+							ids=int(item[3:].split("-")[0])
+							ide=int(item[3:].split("-")[1])
+							if (ide-ids)%3 == 2:
+								if ('start' in anno[annoitem]) and (annoitem!='nuc') :
+									if ids>=anno[annoitem]['start'] and ide<=anno[annoitem]['end']:
+										#print(item,annoitem,this_seq[ids-1])
+										start=anno[annoitem]['start']
+										nuc_st=ids-(ids-start)%3
+										nuc_en=ide-(ide-start)%3
+										thisseq=this_seq
+										for ids in range(len(lineage_ref)):
+											if lineage_ref[ids] == "-":
+												thisseq=thisseq[:ids]+ref[ids]+thisseq[ids+1:]
+										for ids in range(int(item[3:].split(":")[0].split("-")[0]), int(item[3:].split(":")[0].split("-")[1])+1):
+											thisseq=thisseq[:ids-1]+"-"+thisseq[ids:]
+										old_aa=""
+										aa=""
+										temp=ref[nuc_st-1:nuc_en+2]
+										for i in range(0,len(temp),3):
+											old_aa+=table[temp[i:i+3]]
+										temp=thisseq[nuc_st-1:nuc_en+2]
+										temp=temp.replace("-","")
+										for i in range(0,len(temp),3):
+											aa+=table[temp[i:i+3]]
+										#print(old_aa,aa)
+										if aa!=old_aa:
+											# credible mutations: mutations on S, Orf9b, Orf9c, normal to O, or M to others
+											while len(aa)>0:
+												if(old_aa[-1]==aa[-1]):
+													old_aa=old_aa[:-1]
+													aa=aa[:-1]
+													nuc_en-=3
+												elif(old_aa[0]==aa[0]):
+													old_aa=old_aa[1:]
+													aa=aa[1:]
+													nuc_st+=3												
+												else:
+													break
+											if len(aa)==0:
+												aa="-"
+											if (annoitem in ['S','ORF9b']) or (aa=='O'):
+												if nuc_st==nuc_en:
+													muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3)+1)+aa
+												else:
+													muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3)+1)+"-"+str(int((nuc_en-start)/3)+1)+aa
+												if muta not in imp_mut:
+													imp_mut.append(muta)
+											if nuc_st<=start and nuc_en>=start:
+												muta = annoitem+':M1-'
+												if muta not in imp_mut:
+													imp_mut.append(muta)
 				if len(imp_mut)>0:
 					print(node['name'],lineage,','.join(current_mut),count,len(country_list),max(date_list),imp_mut,exmut_list,n_glycan)
 					w=highlight_browser(node)
@@ -410,9 +449,12 @@ read_designation()
 f=open(filename+".json",'r')
 js=json.load(f)
 f.close()
-tsv=open(filename+".tsv",'r')
-tsvlines=tsv.readlines()
-tsv.close()
+if os.path.exists(filename+".tsv"):
+	tsv=open(filename+".tsv",'r')
+	tsvlines=tsv.readlines()
+	tsv.close()
+else:
+	tsvlines=""
 #print(read_tsv())
 anno=js['meta']['genome_annotations']
 js['meta']['colorings'][0]['scale'].append(['highlighted sample','#CCCC00'])
