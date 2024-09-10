@@ -95,13 +95,15 @@ def read_tsv():
 		exmut=[]
 		name=linsp[0]
 		insertion=linsp[10]
-		for m in linsp[12].split(", "):
-			for n in range(int(m.split(":")[0].split("-")[1])-int(m.split(":")[0].split("-")[0])+1):
-				exmut.append(ref[int(m.split(":")[0].split("-")[0])+n+1]+str(int(m.split(":")[0].split("-")[0])+n)+"-")
-		for m in linsp[13].split(", "):
-			if len(m)>0:
-				exmut.append(m)
-		ans.append([name,insertion,exmut])
+		deletion=linsp[12].split(", ")
+		masked=linsp[13].split(",")
+		# for m in linsp[12].split(", "):
+		# 	for n in range(int(m.split(":")[0].split("-")[1])-int(m.split(":")[0].split("-")[0])+1):
+		# 		exmut.append(ref[int(m.split(":")[0].split("-")[0])+n+1]+str(int(m.split(":")[0].split("-")[0])+n)+"-")
+		# for m in linsp[13].split(", "):
+		# 	if len(m)>0:
+		# 		exmut.append(m)
+		ans.append([name,insertion,deletion,masked])
 	return ans 
 	
 def search_tsv(name):
@@ -111,13 +113,9 @@ def search_tsv(name):
 		exmut=[]
 		if name ==linsp[0]:			
 			insertion=linsp[10]
-			for m in linsp[12].split(", "):
-				for n in range(int(m.split(":")[0].split("-")[1])-int(m.split(":")[0].split("-")[0])+1):
-					exmut.append(ref[int(m.split(":")[0].split("-")[0])+n+1]+str(int(m.split(":")[0].split("-")[0])+n)+"-")
-			for m in linsp[13].split(","):
-				if len(m)>0:
-					exmut.append(m)
-			return [insertion,exmut]
+			deletion=linsp[12].split(", ")
+			masked=linsp[13].split(",")
+			return [insertion,deletion,masked]
 	 
 
 import copy
@@ -234,16 +232,40 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 	exmut_list=dict()
 	if 'hCoV' in node['name']:
 		count+=1
-		exmut=search_tsv(node['name'])[1]
-		if len(exmut)>0:
-			i=0
-			while (i<len(exmut)):
-				item=exmut[i]
+		exmut=[]
+		deletion=search_tsv(node['name'])[1]
+		masked=search_tsv(node['name'])[2]
+		# 	for n in range(int(m.split(":")[0].split("-")[1])-int(m.split(":")[0].split("-")[0])+1):
+		# 		exmut.append(ref[int(m.split(":")[0].split("-")[0])+n+1]+str(int(m.split(":")[0].split("-")[0])+n)+"-")
+		i=0
+		while (i<len(deletion)):
+			item=deletion[i]
+			if len(item)>0:
+				local_ref=lineage_ref[int(item.split(":")[0].split("-")[0])-4: int(item.split(":")[0].split("-")[1])+3]
+				thisseq=lineage_ref
+				for ids in range(len(lineage_ref)):
+					if lineage_ref[ids] == "-":
+						thisseq=thisseq[:ids]+ref[ids]+thisseq[ids+1:]
+				for ids in range(int(item.split(":")[0].split("-")[0]), int(item.split(":")[0].split("-")[1])+1):
+					thisseq=thisseq[:ids-1]+"-"+thisseq[ids:]
+				thisseq=thisseq[int(item.split(":")[0].split("-")[0])-4: int(item.split(":")[0].split("-")[1])+3]
+				if local_ref.replace("-","")==thisseq.replace("-",""):
+					deletion.remove(item)
+					i-=1
+				else:
+					exmut.append("del"+item.split(":")[0])
+				i+=1	
+		i=0
+		while (i<len(masked)):
+			item=masked[i]
+			if len(item)>0:
 				ids=int(item[1:-1])
 				if lineage_ref[ids-1]==item[-1]:
-					exmut.remove(item)
-					i-=1		
-				i+=1
+					masked.remove(item)
+					i-=1
+				else:
+					exmut.append(masked[i])
+			i+=1
 		#print(node['name'],count)
 		if back_mutation_count>=5:
 			print(lineage,node['name'],current_mut,exmut)
@@ -260,8 +282,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 			if m in list(exmut_list):
 				exmut_list[m]+=1
 			else:
-				exmut_list.update({m:1})
-				
+				exmut_list.update({m:1})				
 	else:
 		if 'children' in node:
 			for child in node['children']:
@@ -285,6 +306,17 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 			#print(node['name'],important_mut)
 	if not(is_terminal_lineage):
 		lineage='not terminal'
+	for m in list(exmut_list):
+		if m[0]=="d":
+			for annoitem in anno:
+				if int(m[3:].split("-")[1])>=anno['S']['start'] and int(m[3:].split("-")[0])<=anno['S']['start']:
+						important_mut = True
+				if int(m[3:].split("-")[1])>=anno['S']['end'] and int(m[3:].split("-")[0])<=anno['S']['end']:
+						important_mut = True
+			if int(m[3:].split("-")[1])>=anno['S']['start'] or int(m[3:].split("-")[0])<=anno['S']['end']:
+						important_mut = True
+			if int(m[3:].split("-")[1])>=anno['ORF9b']['start'] or int(m[3:].split("-")[0])<=anno['ORF9b']['end']:
+						important_mut = True
 	if important_mut:
 		if is_terminal_lineage:
 			if len(country_list)==1:
@@ -308,7 +340,28 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 									# credible mutations: mutations on S, Orf9b, Orf9c, normal to O, or M to others
 									if (annoitem in ['S','ORF9b']) or (aa=='O') or (nuc_st==start):
 										muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3)+1)+aa
-										imp_mut.append(muta)
+										if muta not in imp_mut:
+											imp_mut.append(muta)
+				for item in list(exmut_list):
+					if item[0]=="d":
+						ids=int(item[3:].split("-")[0])
+						ide=int(item[3:].split("-")[1])
+						for annoitem in anno:
+							if ('start' in anno[annoitem]) and (annoitem!='nuc') and (this_seq[ids-1]==item[-1]):
+								if ids>=anno[annoitem]['start'] and ids<=anno[annoitem]['end']:
+									#print(item,annoitem,this_seq[ids-1])
+									start=anno[annoitem]['start']
+									nuc_st=ids-(ids-start)%3
+									nuc_en=ide-(ide-start)%3
+									old_aa=table[ref[nuc_st-1:nuc_en+2]]
+									aa=table[this_seq[nuc_st-1:nuc_en+2]]									
+									#print(old_aa,aa)
+									if aa!=old_aa:
+										# credible mutations: mutations on S, Orf9b, Orf9c, normal to O, or M to others
+										if (annoitem in ['S','ORF9b']) or (aa=='O') or (nuc_st<=start and nuc_en>=start):
+											muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3)+1)+aa
+											if muta not in imp_mut:
+												imp_mut.append(muta)
 				if len(imp_mut)>0:
 					print(node['name'],lineage,','.join(current_mut),count,len(country_list),max(date_list),imp_mut,exmut_list,n_glycan)
 					w=highlight_browser(node)
