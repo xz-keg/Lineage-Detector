@@ -1,4 +1,4 @@
-# usher_analyse_tool
+# Lineage Detector
 Tools for analysing usher results. 
 
 ``des.json`` is lineage designations and is 
@@ -28,12 +28,12 @@ Packages required:
 Add highlighted lineage features to highlight samples with too many reversions, branches with additional undesignated Spike or Orf9b mutation, or branches with early stop signal/start codon destroyed. 
 
 Link to view important seqs on the most recent uploads (date replaced to the most recent date and num refers to number of seqs (1:0-1000, 2:1000-2000 etc)): 
-Currently updating every 3 days. 
+Currently updating every 3-5 days. 
 
-https://nextstrain.org/fetch/raw.githubusercontent.com/aviczhl2/usher_analyse_tool/main/date-num.json?branchLabel=Spike%20mutations&f_userOrOld=highlighted%20sample
+https://nextstrain.org/fetch/raw.githubusercontent.com/xz-keg/Lineage-Detector/main/date-num.json?branchLabel=Spike%20mutations&f_userOrOld=highlighted%20sample
 
 Example for seqs 0-1000 at 7-10(referring to 7-6~7-9 seqs on GISAID)：
-https://nextstrain.org/fetch/raw.githubusercontent.com/aviczhl2/usher_analyse_tool/main/2024-7-10-1.json?branchLabel=Spike%20mutations&f_userOrOld=highlighted%20sample
+https://nextstrain.org/fetch/raw.githubusercontent.com/xz-keg/Lineage-Detector/main/2024-7-10-1.json?branchLabel=Spike%20mutations&f_userOrOld=highlighted%20sample
 
 
 
