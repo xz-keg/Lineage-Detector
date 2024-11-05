@@ -35,7 +35,9 @@ https://nextstrain.org/fetch/raw.githubusercontent.com/xz-keg/Lineage-Detector/m
 Example for seqs 0-1000 at 7-10(referring to 7-6~7-9 seqs on GISAID)：
 https://nextstrain.org/fetch/raw.githubusercontent.com/xz-keg/Lineage-Detector/main/2024-7-10-1.json?branchLabel=Spike%20mutations&f_userOrOld=highlighted%20sample
 
-
+Tech Report:
+Lineage Detector: Efficient Tool for Detecting New SARS-Cov-2 Lineages
+https://www.biorxiv.org/content/10.1101/2024.11.01.621557v1
 
 
 
