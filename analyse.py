@@ -232,7 +232,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
             #print(node['name'],important_mut)
     if not(is_terminal_lineage):
         lineage='not terminal'
-    if important_mut and args.rev_only:
+    if important_mut and not(args.rev_only):
         if is_terminal_lineage:
             if len(country_list)==1:
                 if country_list[0].lower().strip() in deweighted_countries:     #ignore groups from uk and canada.
