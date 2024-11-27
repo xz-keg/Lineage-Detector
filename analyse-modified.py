@@ -150,7 +150,6 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 		back_mutation_count=backcount
 	
 	designated_mutations=[]
-		
 	while lineage not in variant_mutation_dic:
 		if "." in lineage:
 			lineage=lineage.rsplit(".",1)[0]
@@ -599,22 +598,24 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 												if ids < idi:
 													nuc_en=idi-(idi-start)%3													
 												else:
-													nuc_st=idi-(idi-start)%3													
+													nuc_st=idi-(idi-start)%3		
 											while lineage_ref[nuc_st-1]=="-" or thisseq[nuc_st-1]=="-":
-												nuc_st-=3
+												nuc_st -=3
 											while lineage_ref[nuc_en+1]=="-" or thisseq[nuc_en+1]=="-":
-												nuc_en+=3
+												nuc_en +=3
 											old_aa=""
 											temp=ref[nuc_st-1:nuc_en+2]
 											for i in range(0,len(temp),3):
 												old_aa+=table[temp[i:i+3]]
 											ref_aa=""
 											temp=lineage_ref[nuc_st-1:idi]+ref_ins+lineage_ref[idi:nuc_en+2]											
+											temp=temp.replace("-","")
 											if len(temp)%3==0:
 												for i in range(0,len(temp),3):
-													ref_aa+=table[temp[i:i+3]]											
+													ref_aa+=table[temp[i:i+3]]
 											aa=""
 											temp=thisseq[nuc_st-1:ids]+inserted+thisseq[ids:nuc_en+2]
+											temp=temp.replace("-","")
 											if len(temp)%3==0:
 												for i in range(0,len(temp),3):
 													if temp[i:i+3] in table:
@@ -912,17 +913,17 @@ def designation_browser(current_node,current_mut):
 			if correct_mut[0]!=correct_mut[-1]:
 				all_mutations.append(correct_mut)
 	name=current_node['name']
-	if "NODE" not in name and "_" not in name:
-		lineage=name
-		while lineage !="A" and lineage !="B":
-			if lineage in ins_dic:
-				for item in ins_dic[lineage].split(","):
+	if (name.split(".",1)[0] in (["A", "B"]+list(alias))) and ("_" not in name) :
+		lin=name
+		while lin !="A" and lin !="B":
+			if lin in ins_dic:
+				for item in ins_dic[lin].split(","):
 					if item not in all_mutations:
 						all_mutations.append(item)
-			if "." in lineage:
-				lineage=lineage.rsplit(".",1)[0]
-			elif lineage in list(alias):
-				lineage = alias[lineage]
+			if "." in lin:
+				lin=lin.rsplit(".",1)[0]
+			elif lin in list(alias):
+				lin = alias[lin]
 		variant_mutation_dic[name]=all_mutations
 	if 'children' in current_node:
 		for child in current_node['children']:
@@ -1020,6 +1021,7 @@ def recomb_helper(lineage,current_mut):
 	for item in temp:
 		if len(item[1])+0*item[2]==mutcount:
 			return item
+
 f=open(filename+".json",'r')
 js=json.load(f)
 f.close()

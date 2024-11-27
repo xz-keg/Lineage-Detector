@@ -7,7 +7,7 @@ parser.add_argument('--filename', type=str,default='usher')
 parser.add_argument('--important-threshold', type=int,default=3)
 parser.add_argument('--important-ct-threshold', type=int,default=2)
 parser.add_argument('--output-highlighted', type=bool,default=False)
-
+parser.add_argument('--rev-only',action="store_true")
 args = parser.parse_args()
 important_threshold=args.important_threshold
 important_country=args.important_ct_threshold
@@ -156,8 +156,8 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
                                 if (annoitem in ['S','ORF9b']) or (aa=='O') or (nuc_st==start):
                                     important_mut=True
                                     if annoitem=='S' and not(n_glycan):
-                                        pot=20
-                                        local_ref=lineage_ref[nuc_st-21:nuc_st+21]
+                                        pot=40
+                                        local_ref=lineage_ref[nuc_st-41:nuc_st+21]
                                         ii=0
                                         while ii<len(local_ref):
                                             if local_ref[ii]!='-':
@@ -232,7 +232,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
             #print(node['name'],important_mut)
     if not(is_terminal_lineage):
         lineage='not terminal'
-    if important_mut:
+    if important_mut and not(args.rev_only):
         if is_terminal_lineage:
             if len(country_list)==1:
                 if country_list[0].lower().strip() in deweighted_countries:     #ignore groups from uk and canada.
