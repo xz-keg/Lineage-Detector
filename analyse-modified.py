@@ -280,23 +280,26 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 						if ids > idi - len(inserted) and ids <= idi + len(inserted):
 							exists_ref = True
 							break 
-				if exists_ref:
-					if len(item.split(":")[1].replace("A","").replace("C","").replace("G","").replace("T",""))==0:
-						if ids < idi:
-							local_ref=lineage_ref[ids-3:idi]+inserted+lineage_ref[idi:idi+3]
-							thisseq=lineage_ref[ids-3:ids]+item.split(":")[1]+lineage_ref[ids:idi+3]
-						else:
-							local_ref=lineage_ref[idi-3:idi]+inserted+lineage_ref[idi:ids+3]
-							thisseq=lineage_ref[idi-3:ids]+item.split(":")[1]+lineage_ref[ids:ids+3]	
-						if local_ref==thisseq:
-							insertion.remove(item)
-							i-=1
-						else:
-							if "ins"+item.split(":")[0].split("-")[0]+":"+item.split(":")[1] not in exmut:
-								exmut.append("ins"+item.split(":")[0].split("-")[0]+":"+item.split(":")[1])
+				if "bases" in item.split(":")[1]:
+					exmut.append("ins"+item.split(":")[0].split("-")[0]+":"+item.split(":")[1].split(" ")[0])
 				else:
-					if "ins"+item.split(":")[0].split("-")[0]+":"+item.split(":")[1] not in exmut:
-						exmut.append("ins"+item.split(":")[0].split("-")[0]+":"+item.split(":")[1])
+					if exists_ref:
+						if len(item.split(":")[1].replace("A","").replace("C","").replace("G","").replace("T",""))==0:
+							if ids < idi:
+								local_ref=lineage_ref[ids-3:idi]+inserted+lineage_ref[idi:idi+3]
+								thisseq=lineage_ref[ids-3:ids]+item.split(":")[1]+lineage_ref[ids:idi+3]
+							else:
+								local_ref=lineage_ref[idi-3:idi]+inserted+lineage_ref[idi:ids+3]
+								thisseq=lineage_ref[idi-3:ids]+item.split(":")[1]+lineage_ref[ids:ids+3]	
+							if local_ref==thisseq:
+								insertion.remove(item)
+								i-=1
+							else:
+								if "ins"+item.split(":")[0].split("-")[0]+":"+item.split(":")[1] not in exmut:
+									exmut.append("ins"+item.split(":")[0].split("-")[0]+":"+item.split(":")[1])
+					else:
+						if "ins"+item.split(":")[0].split("-")[0]+":"+item.split(":")[1] not in exmut:
+							exmut.append("ins"+item.split(":")[0].split("-")[0]+":"+item.split(":")[1])
 			i+=1
 		i=0
 		while (i<len(deletion)):
@@ -573,101 +576,198 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 						elif item[0]=="i":
 							ids=int(item[3:].split(":")[0])
 							inserted=item[3:].split(":")[1]
-							if len(inserted)%3 == 0:
-								for annoitem in anno:
-									if ('start' in anno[annoitem]) and (annoitem!='nuc'):
-										if ids>=anno[annoitem]['start'] and ids<=anno[annoitem]['end']:
-											thisseq=this_seq
-											start=anno[annoitem]['start']
-											nuc_st=ids-(ids-start)%3
-											nuc_en=nuc_st
-											for item2 in list(exmut_dict):
-												if item2[0]!="d" and item2[0]!="i" and exmut_dict[item2]>=exmut_dict[item]/2:
-													id=int(item2[1:-1])
-													if id in range(nuc_st-1,nuc_st+2) and id != ids and thisseq[id-1]!="-":
-														thisseq=thisseq[:id-1]+item2[-1]+thisseq[id:]
-											exists_ref=False
-											for itemi in designated_mutations:
-												if itemi[0]=="i":
-													idi=int(itemi[3:].split(":")[0])
-													ref_ins=itemi[3:].split(":")[1]
-													if ids > idi - len(ref_ins) and ids <= idi + len(ref_ins):
-														exists_ref = True
-														break 
-											if exists_ref:
-												if ids < idi:
-													nuc_en=idi-(idi-start)%3													
-												else:
-													nuc_st=idi-(idi-start)%3		
-											while lineage_ref[nuc_st-1]=="-" or thisseq[nuc_st-1]=="-":
-												nuc_st -=3
-											while lineage_ref[nuc_en+1]=="-" or thisseq[nuc_en+1]=="-":
-												nuc_en +=3
-											old_aa=""
-											temp=ref[nuc_st-1:nuc_en+2]
-											for i in range(0,len(temp),3):
-												old_aa+=table[temp[i:i+3]]
-											ref_aa=""
-											temp=lineage_ref[nuc_st-1:idi]+ref_ins+lineage_ref[idi:nuc_en+2]											
-											temp=temp.replace("-","")
-											if len(temp)%3==0:
-												for i in range(0,len(temp),3):
-													ref_aa+=table[temp[i:i+3]]
-											aa=""
-											temp=thisseq[nuc_st-1:ids]+inserted+thisseq[ids:nuc_en+2]
-											temp=temp.replace("-","")
-											if len(temp)%3==0:
-												for i in range(0,len(temp),3):
-													if temp[i:i+3] in table:
-														aa+=table[temp[i:i+3]]
-													else:
-														aa+="X"
-											#print(old_aa, ref_aa, aa)
-											if aa!= old_aa and aa!=ref_aa:
-												if len(old_aa)>1:
+							if inserted.isdecimal():
+								if int(inserted)%3==0:
+									for annoitem in anno:
+										if ('start' in anno[annoitem]) and (annoitem!='nuc'):
+											if ids>=anno[annoitem]['start'] and ids<=anno[annoitem]['end']:
+												thisseq=this_seq
+												start=anno[annoitem]['start']
+												nuc_st=ids-(ids-start)%3
+												nuc_en=nuc_st
+												for item2 in list(exmut_dict):
+													if item2[0]!="d" and item2[0]!="i" and exmut_dict[item2]>=exmut_dict[item]/2:
+														id=int(item2[1:-1])
+														if id in range(nuc_st-1,nuc_st+2) and id != ids and thisseq[id-1]!="-":
+															thisseq=thisseq[:id-1]+item2[-1]+thisseq[id:]
+												exists_ref=False
+												for itemi in designated_mutations:
+													if itemi[0]=="i":
+														idi=int(itemi[3:].split(":")[0])
+														ref_ins=itemi[3:].split(":")[1]
+														if ids > idi - len(ref_ins) and ids <= idi + len(ref_ins):
+															exists_ref = True
+															break 
+												if exists_ref:
 													if ids < idi:
-														while nuc_st < nuc_en:
-															if aa[0]!=old_aa[0] and aa[0]!=ref_aa[0]:
-																muta=annoitem+':'+old_aa[0]+str(int((nuc_st-start)/3)+1)+aa[0]
-																if muta not in imp_mut:
-																	imp_mut.append(muta)
-															old_aa=old_aa[1:]
-															ref_aa=ref_aa[1:]
-															aa=aa[1:]
-															nuc_st+=3
+														nuc_en=idi-(idi-start)%3													
 													else:
-														while nuc_st < nuc_en:
-															if aa[-1]!=old_aa[-1] and aa[-1]!=ref_aa[-1]:
-																muta=annoitem+':'+old_aa[-1]+str(int((nuc_en-start)/3)+1)+aa[-1]
-																if muta not in imp_mut:
-																	imp_mut.append(muta)
-															old_aa=old_aa[:-1]
-															ref_aa=ref_aa[:-1]
-															aa=aa[:-1]
-															nuc_en-=3
-												if ref_aa[0]==old_aa or aa[0]==old_aa:
-													if aa[0]!=old_aa:
-														muta=annoitem+':'+old_aa[0]+str(int((nuc_st-start)/3)+1)+aa[0]
-														if muta not in imp_mut:
-															imp_mut.append(muta)
-													if aa[1:]!=ref_aa[1:]:
-														muta=annoitem+':ins'+str(int((nuc_st-start)/3)+1)+aa[1:]
-														if muta not in imp_mut:
-															imp_mut.append(muta)
-												elif ref_aa[-1]==old_aa or aa[-1]==old_aa:
-													if aa[-1]!=old_aa:
-														muta=annoitem+':'+old_aa[-1]+str(int((nuc_st-start)/3)+1)+aa[-1]
-														if muta not in imp_mut:
-															imp_mut.append(muta)
-													if aa[:-1]!=ref_aa[:-1]:
-														muta=annoitem+':ins'+str(int((nuc_st-start)/3))+aa[:-1]
-														if muta not in imp_mut:
-															imp_mut.append(muta)
-												else:
-													if aa!=ref_aa:
-														muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3))+aa
-														if muta not in imp_mut:
-															imp_mut.append(muta)
+														nuc_st=idi-(idi-start)%3		
+												while lineage_ref[nuc_st-1]=="-" or thisseq[nuc_st-1]=="-":
+													nuc_st -=3
+												while lineage_ref[nuc_en+1]=="-" or thisseq[nuc_en+1]=="-":
+													nuc_en +=3
+												old_aa=""
+												temp=ref[nuc_st-1:nuc_en+2]
+												for i in range(0,len(temp),3):
+													old_aa+=table[temp[i:i+3]]
+												ref_aa=""
+												temp=lineage_ref[nuc_st-1:idi]+ref_ins+lineage_ref[idi:nuc_en+2]											
+												temp=temp.replace("-","")
+												if len(temp)%3==0:
+													for i in range(0,len(temp),3):
+														ref_aa+=table[temp[i:i+3]]
+												aa=""
+												temp=thisseq[nuc_st-1:ids]+"N"*int(inserted)+thisseq[ids:nuc_en+2]
+												temp=temp.replace("-","")
+												if len(temp)%3==0:
+													for i in range(0,len(temp),3):
+														if temp[i:i+3] in table:
+															aa+=table[temp[i:i+3]]
+														else:
+															aa+="X"
+												if len(aa)!=len(ref_aa):
+													if len(old_aa)>1:
+														if ids < idi:
+															while nuc_st < nuc_en:
+																if aa[0]!=old_aa[0] and aa[0]!=ref_aa[0]:
+																	muta=annoitem+':'+old_aa[0]+str(int((nuc_st-start)/3)+1)+aa[0]
+																	if muta not in imp_mut:
+																		imp_mut.append(muta)
+																old_aa=old_aa[1:]
+																ref_aa=ref_aa[1:]
+																aa=aa[1:]
+																nuc_st+=3
+														else:
+															while nuc_st < nuc_en:
+																if aa[-1]!=old_aa[-1] and aa[-1]!=ref_aa[-1]:
+																	muta=annoitem+':'+old_aa[-1]+str(int((nuc_en-start)/3)+1)+aa[-1]
+																	if muta not in imp_mut:
+																		imp_mut.append(muta)
+																old_aa=old_aa[:-1]
+																ref_aa=ref_aa[:-1]
+																aa=aa[:-1]
+																nuc_en-=3
+													if ref_aa[0]==old_aa or aa[0]==old_aa:
+														if aa[0]!=old_aa:
+															muta=annoitem+':'+old_aa[0]+str(int((nuc_st-start)/3)+1)+aa[0]
+															if muta not in imp_mut:
+																imp_mut.append(muta)
+														if aa[1:]!=ref_aa[1:]:
+															muta=annoitem+':ins'+str(int((nuc_st-start)/3)+1)+aa[1:]
+															if muta not in imp_mut:
+																imp_mut.append(muta)
+													elif ref_aa[-1]==old_aa or aa[-1]==old_aa:
+														if aa[-1]!=old_aa:
+															muta=annoitem+':'+old_aa[-1]+str(int((nuc_st-start)/3)+1)+aa[-1]
+															if muta not in imp_mut:
+																imp_mut.append(muta)
+														if aa[:-1]!=ref_aa[:-1]:
+															muta=annoitem+':ins'+str(int((nuc_st-start)/3))+aa[:-1]
+															if muta not in imp_mut:
+																imp_mut.append(muta)
+													else:
+														if aa!=ref_aa:
+															muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3))+aa
+															if muta not in imp_mut:
+																imp_mut.append(muta)
+
+							else:
+								if len(inserted)%3 == 0:
+									for annoitem in anno:
+										if ('start' in anno[annoitem]) and (annoitem!='nuc'):
+											if ids>=anno[annoitem]['start'] and ids<=anno[annoitem]['end']:
+												thisseq=this_seq
+												start=anno[annoitem]['start']
+												nuc_st=ids-(ids-start)%3
+												nuc_en=nuc_st
+												for item2 in list(exmut_dict):
+													if item2[0]!="d" and item2[0]!="i" and exmut_dict[item2]>=exmut_dict[item]/2:
+														id=int(item2[1:-1])
+														if id in range(nuc_st-1,nuc_st+2) and id != ids and thisseq[id-1]!="-":
+															thisseq=thisseq[:id-1]+item2[-1]+thisseq[id:]
+												exists_ref=False
+												for itemi in designated_mutations:
+													if itemi[0]=="i":
+														idi=int(itemi[3:].split(":")[0])
+														ref_ins=itemi[3:].split(":")[1]
+														if ids > idi - len(ref_ins) and ids <= idi + len(ref_ins):
+															exists_ref = True
+															break 
+												if exists_ref:
+													if ids < idi:
+														nuc_en=idi-(idi-start)%3													
+													else:
+														nuc_st=idi-(idi-start)%3		
+												while lineage_ref[nuc_st-1]=="-" or thisseq[nuc_st-1]=="-":
+													nuc_st -=3
+												while lineage_ref[nuc_en+1]=="-" or thisseq[nuc_en+1]=="-":
+													nuc_en +=3
+												old_aa=""
+												temp=ref[nuc_st-1:nuc_en+2]
+												for i in range(0,len(temp),3):
+													old_aa+=table[temp[i:i+3]]
+												ref_aa=""
+												temp=lineage_ref[nuc_st-1:idi]+ref_ins+lineage_ref[idi:nuc_en+2]											
+												temp=temp.replace("-","")
+												if len(temp)%3==0:
+													for i in range(0,len(temp),3):
+														ref_aa+=table[temp[i:i+3]]
+												aa=""
+												temp=thisseq[nuc_st-1:ids]+inserted+thisseq[ids:nuc_en+2]
+												temp=temp.replace("-","")
+												if len(temp)%3==0:
+													for i in range(0,len(temp),3):
+														if temp[i:i+3] in table:
+															aa+=table[temp[i:i+3]]
+														else:
+															aa+="X"
+												#print(old_aa, ref_aa, aa)
+												if aa!= old_aa and aa!=ref_aa:
+													if len(old_aa)>1:
+														if ids < idi:
+															while nuc_st < nuc_en:
+																if aa[0]!=old_aa[0] and aa[0]!=ref_aa[0]:
+																	muta=annoitem+':'+old_aa[0]+str(int((nuc_st-start)/3)+1)+aa[0]
+																	if muta not in imp_mut:
+																		imp_mut.append(muta)
+																old_aa=old_aa[1:]
+																ref_aa=ref_aa[1:]
+																aa=aa[1:]
+																nuc_st+=3
+														else:
+															while nuc_st < nuc_en:
+																if aa[-1]!=old_aa[-1] and aa[-1]!=ref_aa[-1]:
+																	muta=annoitem+':'+old_aa[-1]+str(int((nuc_en-start)/3)+1)+aa[-1]
+																	if muta not in imp_mut:
+																		imp_mut.append(muta)
+																old_aa=old_aa[:-1]
+																ref_aa=ref_aa[:-1]
+																aa=aa[:-1]
+																nuc_en-=3
+													if ref_aa[0]==old_aa or aa[0]==old_aa:
+														if aa[0]!=old_aa:
+															muta=annoitem+':'+old_aa[0]+str(int((nuc_st-start)/3)+1)+aa[0]
+															if muta not in imp_mut:
+																imp_mut.append(muta)
+														if aa[1:]!=ref_aa[1:]:
+															muta=annoitem+':ins'+str(int((nuc_st-start)/3)+1)+aa[1:]
+															if muta not in imp_mut:
+																imp_mut.append(muta)
+													elif ref_aa[-1]==old_aa or aa[-1]==old_aa:
+														if aa[-1]!=old_aa:
+															muta=annoitem+':'+old_aa[-1]+str(int((nuc_st-start)/3)+1)+aa[-1]
+															if muta not in imp_mut:
+																imp_mut.append(muta)
+														if aa[:-1]!=ref_aa[:-1]:
+															muta=annoitem+':ins'+str(int((nuc_st-start)/3))+aa[:-1]
+															if muta not in imp_mut:
+																imp_mut.append(muta)
+													else:
+														if aa!=ref_aa:
+															muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3))+aa
+															if muta not in imp_mut:
+																imp_mut.append(muta)
 						else:
 							ids=int(item[1:-1])
 							for annoitem in anno:
@@ -813,7 +913,13 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 					exmut_list=[]
 					for item in list(exmut_dict):
 						#if exmut_dict[item]>=count/2:
-							exmut_list.append(item.replace(":","")+":"+str(exmut_dict[item]))
+						if "ins" in item:
+							if not item.split(":")[1].isdecimal():
+								exmut_list.append(item.replace(":","")+":"+str(exmut_dict[item]))
+							else:
+								exmut_list.append(item.replace(":","_")+":"+str(exmut_dict[item]))
+						else:
+							exmut_list.append(item+":"+str(exmut_dict[item]))
 					if important_mut:
 						print(node['name'],lineage,','.join(current_mut),count,len(country_list),max(date_list),';'.join(imp_mut_list),','.join(exmut_list),n_glycan)
 						w=highlight_browser(node)
