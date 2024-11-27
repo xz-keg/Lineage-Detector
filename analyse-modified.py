@@ -587,7 +587,6 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 													id=int(item2[1:-1])
 													if id in range(nuc_st-1,nuc_st+2) and id != ids and thisseq[id-1]!="-":
 														thisseq=thisseq[:id-1]+item2[-1]+thisseq[id:]
-											ref_aa=""
 											exists_ref=False
 											for itemi in designated_mutations:
 												if itemi[0]=="i":
@@ -601,36 +600,21 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 													nuc_en=idi-(idi-start)%3													
 												else:
 													nuc_st=idi-(idi-start)%3													
-											temp=lineage_ref[nuc_st-1:idi]+ref_ins+lineage_ref[idi:nuc_en+2]
-											if temp[0]=="-":
-												i=0
-												while lineage_ref[nuc_st-1-3*i]=="-":
-													i+=1
-												temp=lineage_ref[nuc_st-1-3*i:nuc_st-1]+temp
-											if temp[-1]=="-":
-												i=0
-												while lineage_ref[nuc_en+1+3*i]=="-":
-													i+=1
-												temp=temp+lineage_ref[nuc_en+2:nuc_en+2+3*i]
-											if len(temp)%3==0:
-												for i in range(0,len(temp),3):
-													ref_aa+=table[temp[i:i+3]]
+											while lineage_ref[nuc_st-1]=="-" or thisseq[nuc_st-1]=="-":
+												nuc_st-=3
+											while lineage_ref[nuc_en+1]=="-" or thisseq[nuc_en+1]=="-":
+												nuc_en+=3
 											old_aa=""
 											temp=ref[nuc_st-1:nuc_en+2]
 											for i in range(0,len(temp),3):
 												old_aa+=table[temp[i:i+3]]
+											ref_aa=""
+											temp=lineage_ref[nuc_st-1:idi]+ref_ins+lineage_ref[idi:nuc_en+2]											
+											if len(temp)%3==0:
+												for i in range(0,len(temp),3):
+													ref_aa+=table[temp[i:i+3]]											
 											aa=""
 											temp=thisseq[nuc_st-1:ids]+inserted+thisseq[ids:nuc_en+2]
-											if temp[0]=="-":
-												i=0
-												while thisseq[nuc_st-1-3*i]=="-":
-													i+=1
-												temp=thisseq[nuc_st-1-3*i:nuc_st-1]+temp
-											if temp[-1]=="-":
-												i=0
-												while thisseq[nuc_en+1+3*i]=="-":
-													i+=1
-												temp=temp+thisseq[nuc_en+2:nuc_en+2+3*i]
 											if len(temp)%3==0:
 												for i in range(0,len(temp),3):
 													if temp[i:i+3] in table:
@@ -928,7 +912,7 @@ def designation_browser(current_node,current_mut):
 			if correct_mut[0]!=correct_mut[-1]:
 				all_mutations.append(correct_mut)
 	name=current_node['name']
-	if name.split(".",1)[0] in alias:
+	if "NODE" not in name and "_" not in name:
 		lineage=name
 		while lineage !="A" and lineage !="B":
 			if lineage in ins_dic:
