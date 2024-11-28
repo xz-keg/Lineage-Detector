@@ -260,7 +260,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 	if 'hCoV-19/' == node['name'][:8]:
 		count+=1
 		exmut=[]
-		#print(node['name'])		
+		#print(node['name'])
 		insertion=search_tsv(node['name'])[0]
 		deletion=search_tsv(node['name'])[1]
 		masked=search_tsv(node['name'])[2]
@@ -546,7 +546,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 															if muta not in imp_mut:
 																imp_mut.append(muta)
 												else:
-													while len(aa)>0:
+													while len(aa)>0 and len(ref_aa)>0:
 														if (old_aa[-1]==aa[-1]) or (ref_aa[-1]==aa[-1]):
 															old_aa=old_aa[:-1]
 															ref_aa=ref_aa[:-1]
@@ -612,7 +612,10 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 												for i in range(0,len(temp),3):
 													old_aa+=table[temp[i:i+3]]
 												ref_aa=""
-												temp=lineage_ref[nuc_st-1:idi]+ref_ins+lineage_ref[idi:nuc_en+2]											
+												if exists_ref:
+													temp=lineage_ref[nuc_st-1:idi]+ref_ins+lineage_ref[idi:nuc_en+2]
+												else:			
+													temp=lineage_ref[nuc_st-1:nuc_en+2]
 												temp=temp.replace("-","")
 												if len(temp)%3==0:
 													for i in range(0,len(temp),3):
@@ -708,7 +711,10 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 												for i in range(0,len(temp),3):
 													old_aa+=table[temp[i:i+3]]
 												ref_aa=""
-												temp=lineage_ref[nuc_st-1:idi]+ref_ins+lineage_ref[idi:nuc_en+2]											
+												if exists_ref:
+													temp=lineage_ref[nuc_st-1:idi]+ref_ins+lineage_ref[idi:nuc_en+2]
+												else:
+													temp=lineage_ref[nuc_st-1:nuc_en+2]
 												temp=temp.replace("-","")
 												if len(temp)%3==0:
 													for i in range(0,len(temp),3):
