@@ -501,11 +501,11 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 											nuc_st=ids-(ids-start)%3-3
 											nuc_en=ide-(ide-start)%3+3
 											thisseq=this_seq
-											for ids in range(len(lineage_ref)):
-												if lineage_ref[ids] == "-":
-													thisseq=thisseq[:ids]+ref[ids]+thisseq[ids+1:]
-											for ids in range(int(item[3:].split(":")[0].split("-")[0]), int(item[3:].split(":")[0].split("-")[1])+1):
-												thisseq=thisseq[:ids-1]+"-"+thisseq[ids:]
+											for id in range(len(lineage_ref)):
+												if lineage_ref[id] == "-":
+													thisseq=thisseq[:id]+ref[id]+thisseq[id+1:]
+											for id in range(int(item[3:].split(":")[0].split("-")[0]), int(item[3:].split(":")[0].split("-")[1])+1):
+												thisseq=thisseq[:id-1]+"-"+thisseq[id:]
 											for item2 in list(exmut_dict):
 												if item2[0]!="d" and item2[0]!="i" and exmut_dict[item2]>=exmut_dict[item]/2:
 													id=int(item2[1:-1])
@@ -524,14 +524,14 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 												for i in range(0,len(temp),3):
 													ref_aa+=table[temp[i:i+3]]
 											else:
-												print("Error:", lineage, annoitem, nuc_st, nuc_en+2, "lineage_ref", lineage_ref[nuc_st-1:nuc_en+2])
+												print("Error:", lineage, annoitem, item, nuc_st, nuc_en+2, "lineage_ref", lineage_ref[nuc_st-1:nuc_en+2])
 											temp=thisseq[nuc_st-1:nuc_en+2]
 											temp=temp.replace("-","")
 											if len(temp)%3==0:
 												for i in range(0,len(temp),3):
 													aa+=table[temp[i:i+3]]
 											else:
-												print("Error:", lineage, annoitem, nuc_st, nuc_en+2, "thisseq", thisseq[nuc_st-1:nuc_en+2])
+												print("Error:", lineage, annoitem, item, nuc_st, nuc_en+2, "thisseq", thisseq[nuc_st-1:nuc_en+2])
 											#print(old_aa,ref_aa,aa)
 											if aa!=old_aa and aa!= ref_aa:
 												# credible mutations: mutations on S, Orf9b, Orf9c, normal to O, or M to others
