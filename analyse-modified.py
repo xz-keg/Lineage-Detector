@@ -191,7 +191,6 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 							if item[-1]==inserted[ids-idi-1]:
 								ins_artefact = True
 								mut.remove(item)
-								i-=1
 								break 
 				if ins_artefact:
 					continue
