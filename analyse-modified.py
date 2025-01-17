@@ -18,6 +18,7 @@ deweighted_countries=['united_kingdom','canada']
 def read_ref():
 	ref=open("reference_seq.txt",'r')
 	q=ref.readlines()
+	ref.close()
 	seq=''
 	for l in q:
 		for w in l:
@@ -31,6 +32,7 @@ def read_ref():
 def read_table():
 	fs=open("table.txt",'r')
 	flines=fs.readlines()
+	fs.close()
 	trans_table={}
 	for l in flines:
 		linsp=l.split()
@@ -170,7 +172,11 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 	exmut_dict=dict()
 	i=0
 	n_glycan=False
+	#if len(mut)==0:
+		#print(node['name'], lineage)
 	while (i<len(mut) and len(mut)>0):
+		#if len(mut)==0:
+		#print(node['name'], lineage, mut)
 		item=mut[i]
 		ids=int(item[1:-1])
 		this_seq=this_seq[:ids-1]+item[-1]+this_seq[ids:]
@@ -190,6 +196,8 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 						if ids > idi and ids <= idi + len(inserted):
 							if item[-1]==inserted[ids-idi-1]:
 								ins_artefact = True
+								#if i == 0:
+									#print(node['name'], lineage, mut)
 								mut.remove(item)
 								break 
 				if ins_artefact:
@@ -369,10 +377,12 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 			ct = "China"
 		if ct == "Macao":
 			ct = "Macau"
-		if ct == "Crimea":
+		if ct == "Crimea" or "Russia/40" in node['name'] or "Russia/43-CRIE" in node['name']:
 			ct = "Ukraine"
 		if ct == "Kosovo":
 			ct == "Serbia"
+		if "Spain/ML" in node['name'] or "Spain/CE" in node['name']: 
+			ct == "Ceuta and Melilla"
 		if not(ct in country_list):
 			country_list.append(ct)
 		if 'GBW' in node['name']:
@@ -632,6 +642,8 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 													if len(old_aa)>1:
 														if ids < idi:
 															while nuc_st < nuc_en:
+																if len(ref_aa)==0:
+																	break
 																if aa[0]!=old_aa[0] and aa[0]!=ref_aa[0]:
 																	muta=annoitem+':'+old_aa[0]+str(int((nuc_st-start)/3)+1)+aa[0]
 																	if muta not in imp_mut:
@@ -642,6 +654,8 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 																nuc_st+=3
 														else:
 															while nuc_st < nuc_en:
+																if len(ref_aa)==0:
+																	break
 																if aa[-1]!=old_aa[-1] and aa[-1]!=ref_aa[-1]:
 																	muta=annoitem+':'+old_aa[-1]+str(int((nuc_en-start)/3)+1)+aa[-1]
 																	if muta not in imp_mut:
@@ -650,7 +664,11 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 																ref_aa=ref_aa[:-1]
 																aa=aa[:-1]
 																nuc_en-=3
-													if ref_aa[0]==old_aa or aa[0]==old_aa:
+													if len(ref_aa)==0:
+														muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3))+aa
+														if muta not in imp_mut:
+															imp_mut.append(muta)
+													elif ref_aa[0]==old_aa or aa[0]==old_aa:
 														if aa[0]!=old_aa:
 															muta=annoitem+':'+old_aa[0]+str(int((nuc_st-start)/3)+1)+aa[0]
 															if muta not in imp_mut:
@@ -732,6 +750,8 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 													if len(old_aa)>1:
 														if ids < idi:
 															while nuc_st < nuc_en:
+																if len(ref_aa)==0:
+																	break
 																if aa[0]!=old_aa[0] and aa[0]!=ref_aa[0]:
 																	muta=annoitem+':'+old_aa[0]+str(int((nuc_st-start)/3)+1)+aa[0]
 																	if muta not in imp_mut:
@@ -742,6 +762,8 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 																nuc_st+=3
 														else:
 															while nuc_st < nuc_en:
+																if len(ref_aa)==0:
+																	break
 																if aa[-1]!=old_aa[-1] and aa[-1]!=ref_aa[-1]:
 																	muta=annoitem+':'+old_aa[-1]+str(int((nuc_en-start)/3)+1)+aa[-1]
 																	if muta not in imp_mut:
@@ -750,7 +772,11 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 																ref_aa=ref_aa[:-1]
 																aa=aa[:-1]
 																nuc_en-=3
-													if ref_aa[0]==old_aa or aa[0]==old_aa:
+													if len(ref_aa)==0:
+														muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3))+aa
+														if muta not in imp_mut:
+															imp_mut.append(muta)
+													elif ref_aa[0]==old_aa or aa[0]==old_aa:
 														if aa[0]!=old_aa:
 															muta=annoitem+':'+old_aa[0]+str(int((nuc_st-start)/3)+1)+aa[0]
 															if muta not in imp_mut:
@@ -988,6 +1014,7 @@ alias=read_alias()
 def read_insertion():
 	insref=open("insertion.txt",'r')
 	flines=insref.readlines()
+	insref.close()
 	ins_dic={}
 	for l in flines:
 		linsp=l.split()
@@ -1164,6 +1191,7 @@ root=tree['children'][0]
 l,count,countries,dates,exmuts=node_browser(root,'',ref,[],0)
 outjs=open(filename+"-out.json",'w')
 json.dump(js,outjs)
+outjs.close()
 
 '''
 while 'children' in node_main:
