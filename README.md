@@ -30,7 +30,10 @@ Add highlighted lineage features to highlight samples with too many reversions, 
 
 Link to view important seqs on the most recent uploads (date replaced to the most recent date and num refers to number of seqs (1:0-1000, 2:1000-2000 etc)): 
 Currently updating every 3 days. (2024-7-1)
+
 Update on 2024-11-19: Change analysing period to 4 days due to reduced global sequencing.
+
+Update on 2025-1-20: Add Orf3a as one of the default highlight proteins. 
 
 https://nextstrain.org/fetch/raw.githubusercontent.com/xz-keg/Lineage-Detector/main/date-num.json?branchLabel=Spike%20mutations&f_userOrOld=highlighted%20sample
 
