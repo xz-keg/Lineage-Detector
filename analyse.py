@@ -14,6 +14,7 @@ important_country=args.important_ct_threshold
 filename=args.filename
 opt=args.output_highlighted
 deweighted_countries=["england",'scotland','wales','canada']
+highlighted_proteins=['S','Orf9b','Orf3a']
 
 def read_ref():
     ref=open("reference_seq.txt",'r')
@@ -153,7 +154,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
                             aa=table[this_seq[nuc_st-1:nuc_st+2]]
                             if aa!=old_aa:
                                 # credible mutations: mutations on S, Orf9b, Orf9c, normal to O, or M to others
-                                if (annoitem in ['S','ORF9b']) or (aa=='O') or (nuc_st==start):
+                                if (annoitem in highlighted_proteins) or (aa=='O') or (nuc_st==start):
                                     important_mut=True
                                     if annoitem=='S' and not(n_glycan):
                                         pot=40
@@ -253,7 +254,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
                                 #print(old_aa,aa)
                                 if aa!=old_aa:
                                     # credible mutations: mutations on S, Orf9b, Orf9c, normal to O, or M to others
-                                    if (annoitem in ['S','ORF9b']) or (aa=='O') or (nuc_st==start):
+                                    if (annoitem in highlighted_proteins) or (aa=='O') or (nuc_st==start):
                                         muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3)+1)+aa
                                         imp_mut.append(muta)
                 if len(imp_mut)>0:
