@@ -357,7 +357,8 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 			ids=int(item[1:-1])
 			if lineage_ref[ids-1]=='-':
 				if this_seq[ids-1]!='-':
-					exmut.append(item)
+					if item not in exmut:
+						exmut.append(item)
 				current_mut.remove(item)
 				i-=1
 			i+=1
