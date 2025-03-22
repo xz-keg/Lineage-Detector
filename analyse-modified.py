@@ -253,8 +253,10 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 			# if the position is not already reverted in designated
 			#if lineage_ref[ids-1]!=ref[ids-1] and lineage_ref[ids-1]!='-':
 			if lineage_ref[ids-1]!=ref[ids-1]:
+				#print(item)
 				back_mutation_count+=1
 			else:
+				#print(item)
 				mut.remove(item)
 				i-=1
 		i+=1
@@ -362,11 +364,14 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 		#print(node['name'],count)
 		if back_mutation_count>=5:
 			temp_lin,temp_mut,bkct = recomb_helper(copy.deepcopy(lineage),copy.deepcopy(current_mut))
+			temp_exmut=copy.deepcopy(exmut)
 			for i in range(len(temp_mut)):
 				ids = int(temp_mut[i][1:-1])
 				if ref[ids-1]==temp_mut[i][-1]:
+					if temp_mut[i] not in exmut:
+						exmut.append("rev"+temp_mut[i])
 					temp_mut[i]+="r"
-			print(lineage,node['name'],temp_lin,",".join(temp_mut),bkct,",".join(exmut))
+			print(lineage,node['name'],temp_lin,",".join(temp_mut),bkct,",".join(temp_exmut))
 			w=highlight_browser(node)
 		ct=node['name'].split('/')[1]
 		if ct in ["env", "ENV", "deer", "bat"]:
@@ -379,10 +384,10 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 			ct = "Macau"
 		if ct == "Crimea" or "Russia/40" in node['name'] or "Russia/43-CRIE" in node['name']:
 			ct = "Ukraine"
-		if ct == "Kosovo":
-			ct == "Serbia"
-		if "Spain/ML" in node['name'] or "Spain/CE" in node['name']: 
-			ct == "Ceuta and Melilla"
+		# if ct == "Kosovo":
+		# 	ct == "Serbia"
+		# if "Spain/ML" in node['name'] or "Spain/CE" in node['name']: 
+		# 	ct == "Ceuta and Melilla"
 		if not(ct in country_list):
 			country_list.append(ct)
 		if 'GBW' in node['name']:
@@ -496,7 +501,10 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 										muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3)+1)+aa
 										if muta not in imp_mut:
 											imp_mut.append(muta)
+				print_exmut_dict=copy.deepcopy(exmut_dict)
+				print_current_mut=copy.deepcopy(current_mut)
 				for item in list(exmut_dict):
+					#print(exmut_dict,ii,item)
 					if exmut_dict[item] >= count/2:						
 						if item[0]=="d":
 							ids=int(item[3:].split("-")[0])
@@ -516,7 +524,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 											for id in range(int(item[3:].split(":")[0].split("-")[0]), int(item[3:].split(":")[0].split("-")[1])+1):
 												thisseq=thisseq[:id-1]+"-"+thisseq[id:]
 											for item2 in list(exmut_dict):
-												if item2[0]!="d" and item2[0]!="i" and exmut_dict[item2]>=exmut_dict[item]/2:
+												if item2[0]!="d" and item2[0]!="i" and item2[0]!="r" and exmut_dict[item2]>=exmut_dict[item]/2:
 													id=int(item2[1:-1])
 													if id in range(nuc_st-1,nuc_en+2) and thisseq[id-1]!="-":
 														thisseq=thisseq[:id-1]+item2[-1]+thisseq[id:]
@@ -595,7 +603,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 												nuc_st=ids-(ids-start)%3
 												nuc_en=nuc_st
 												for item2 in list(exmut_dict):
-													if item2[0]!="d" and item2[0]!="i" and exmut_dict[item2]>=exmut_dict[item]/2:
+													if item2[0]!="d" and item2[0]!="i" and item2[0]!="r" and exmut_dict[item2]>=exmut_dict[item]/2:
 														id=int(item2[1:-1])
 														if id in range(nuc_st-1,nuc_st+2) and id != ids and thisseq[id-1]!="-":
 															thisseq=thisseq[:id-1]+item2[-1]+thisseq[id:]
@@ -665,7 +673,9 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 																aa=aa[:-1]
 																nuc_en-=3
 													if len(ref_aa)==0:
-														muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3))+aa
+														#muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3))+aa
+														muta=annoitem+':ins'+str(int((nuc_st-start)/3))+aa
+														print(old_aa,ref_aa,aa)
 														if muta not in imp_mut:
 															imp_mut.append(muta)
 													elif ref_aa[0]==old_aa or aa[0]==old_aa:
@@ -691,7 +701,6 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 															muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3))+aa
 															if muta not in imp_mut:
 																imp_mut.append(muta)
-
 							else:
 								if len(inserted)%3 == 0:
 									for annoitem in anno:
@@ -702,7 +711,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 												nuc_st=ids-(ids-start)%3
 												nuc_en=nuc_st
 												for item2 in list(exmut_dict):
-													if item2[0]!="d" and item2[0]!="i" and exmut_dict[item2]>=exmut_dict[item]/2:
+													if item2[0]!="d" and item2[0]!="i" and item2[0]!="r" and exmut_dict[item2]>=exmut_dict[item]/2:
 														id=int(item2[1:-1])
 														if id in range(nuc_st-1,nuc_st+2) and id != ids and thisseq[id-1]!="-":
 															thisseq=thisseq[:id-1]+item2[-1]+thisseq[id:]
@@ -799,7 +808,96 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 															muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3))+aa
 															if muta not in imp_mut:
 																imp_mut.append(muta)
-						else:
+								else:
+									thisseq=this_seq
+									exists_del=False
+									idi = ids
+									for item2 in list(exmut_dict):
+										if item2[0]=="d":
+											ids=int(item2[3:].split("-")[0])
+											ide=int(item2[3:].split("-")[1])
+											if ide <= idi+9 and ids >= idi-8 and (ide-ids+1)==len(inserted):
+												exists_del = True
+												break
+									if exists_del:
+										del print_exmut_dict[item2]
+										del print_exmut_dict[item]	
+										if ids<= idi:
+											thisseq=thisseq[:ids-1]+thisseq[ide:idi]+inserted+thisseq[idi:]
+											ide=idi
+											#print(lineage_ref[ids:ide+1],thisseq[ids:ide+1])
+											for item2 in list(exmut_dict):
+												if item2[0]=="r":
+													if int(item2[4:-1]) in range(ids,ide+1):
+														id=int(item2[4:-1])
+														id-=len(inserted)
+														thisseq=thisseq[:id-1]+item2[-1]+thisseq[id:]
+														del print_exmut_dict[item2]
+										else:
+											thisseq=thisseq[:idi]+thisseq[idi:ids-1]+inserted+thisseq[ide:]
+											ids=idi
+											#print(lineage_ref[ids:ide+1],thisseq[ids:ide+1])
+											for item2 in list(exmut_dict):
+												if item2[0]=="r":
+													if int(item2[4:-1]) in range(ids,ide+1):
+														id=int(item2[4:-1])
+														id+=len(inserted)
+														thisseq=thisseq[:id-1]+item2[-1]+thisseq[id:]
+														del print_exmut_dict[item2]
+										#print(current_mut, exmut_dict)
+										
+										# if list(exmut_dict).index(item2)<ii:
+										# 	ii-=1
+										#print(lineage_ref[ids:ide+1],thisseq[ids:ide+1])
+										#ii-=1
+										#j=0
+										for item2 in current_mut:
+											if int(item2[1:-1]) in range(ids,ide+1):
+												print_current_mut.remove(item2)
+										for id in range(ids,ide+1):
+											if thisseq[id-1]!= lineage_ref[id-1]:
+												#print(id, thisseq[id-1], lineage_ref[id-1])
+												print_current_mut.append(ref[id-1]+str(id)+thisseq[id])
+												for annoitem in anno:
+													if ('start' in anno[annoitem]) and (annoitem!='nuc'):
+														if ids>=anno[annoitem]['start'] and ids<=anno[annoitem]['end']:
+															start=anno[annoitem]['start']
+															nuc_st=ids-(ids-start)%3
+															nuc_en=ide-(ide-start)%3
+															while lineage_ref[nuc_st-1]=="-" or thisseq[nuc_st-1]=="-":
+																nuc_st -=3
+															while lineage_ref[nuc_en+1]=="-" or thisseq[nuc_en+1]=="-":
+																nuc_en +=3
+															old_aa=""
+															temp=ref[nuc_st-1:nuc_en+2]
+															for i in range(0,len(temp),3):
+																old_aa+=table[temp[i:i+3]]
+															ref_aa=""
+															temp=lineage_ref[nuc_st-1:nuc_en+2]
+															temp=temp.replace("-","")
+															if len(temp)%3==0:
+																for i in range(0,len(temp),3):
+																	ref_aa+=table[temp[i:i+3]]
+															aa=""
+															temp=thisseq[nuc_st-1:nuc_en+2]
+															temp=temp.replace("-","")
+															if len(temp)%3==0:
+																for i in range(0,len(temp),3):
+																	if temp[i:i+3] in table:
+																		aa+=table[temp[i:i+3]]
+																	else:
+																		aa+="X"
+															if aa!= old_aa and aa!=ref_aa:
+																if len(aa)==len(old_aa):
+																	for i in range(len(old_aa)):
+																		if (old_aa[i]!=aa[i]) and (ref_aa[i]!=aa[i]):
+																			muta=annoitem+':'+old_aa[i]+str(int((nuc_st-start)/3)+1+i)+aa[i]
+																			if muta not in imp_mut:
+																				#print(muta)
+																				imp_mut.append(muta)
+										#print(lineage_ref[ids:ide+1],thisseq[ids:ide+1])
+										#print(current_mut, exmut_dict)
+						elif item[0]!="r":
 							ids=int(item[1:-1])
 							for annoitem in anno:
 								if ('start' in anno[annoitem]) and (annoitem!='nuc'):
@@ -810,7 +908,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 										start=anno[annoitem]['start']
 										nuc_st=ids-(ids-start)%3
 										for item2 in list(exmut_dict):
-											if item2[0]!="d" and item2[0]!="i" and exmut_dict[item2]>=exmut_dict[item]/2:
+											if item2[0]!="d" and item2[0]!="i" and item2[0]!="r" and exmut_dict[item2]>=exmut_dict[item]/2:
 												id=int(item2[1:-1])
 												if id in range(nuc_st-1,nuc_st+2) and id != ids and thisseq[id-1]!="-":
 													thisseq=thisseq[:id-1]+item2[-1]+thisseq[id:]
@@ -837,6 +935,8 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 											muta=annoitem+':'+old_aa+str(int((nuc_st-start)/3)+1)+aa
 											if muta not in imp_mut:
 												imp_mut.append(muta)
+					#ii+=1
+					#print(exmut_dict,i,item)	
 				if len(imp_mut)>0:
 					important_mut = False
 					imp_mut_dict={}
@@ -942,17 +1042,17 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 						imp_mut_dict[item]=",".join(newmutlist)
 						imp_mut_list.append(item+":"+",".join(newmutlist))
 					exmut_list=[]
-					for item in list(exmut_dict):
+					for item in list(print_exmut_dict):
 						#if exmut_dict[item]>=count/2:
 						if "ins" in item:
 							if not item.split(":")[1].isdecimal():
-								exmut_list.append(item.replace(":","")+":"+str(exmut_dict[item]))
+								exmut_list.append(item.replace(":","")+":"+str(print_exmut_dict[item]))
 							else:
-								exmut_list.append(item.replace(":","_")+":"+str(exmut_dict[item]))
+								exmut_list.append(item.replace(":","_")+":"+str(print_exmut_dict[item]))
 						else:
-							exmut_list.append(item+":"+str(exmut_dict[item]))
+							exmut_list.append(item+":"+str(print_exmut_dict[item]))
 					if important_mut:
-						print(node['name'],lineage,','.join(current_mut),count,len(country_list),max(date_list),';'.join(imp_mut_list),','.join(exmut_list),n_glycan)
+						print(node['name'],lineage,','.join(print_current_mut),count,len(country_list),max(date_list),';'.join(imp_mut_list),','.join(exmut_list),n_glycan)
 						w=highlight_browser(node)
 	return [lineage,count,copy.deepcopy(country_list),copy.deepcopy(date_list),copy.deepcopy(exmut_dict)]
 
