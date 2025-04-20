@@ -37,6 +37,8 @@ Update on 2025-1-20: Add Orf3a as one of the default highlight proteins.
 
 Update on 2025-3-18: Change analysing period to 5 days due to further reduced global sequencing.
 
+Update on 2025-4-20: Change analysing period to 7 days due to further reduced global sequencing.
+
 https://nextstrain.org/fetch/raw.githubusercontent.com/xz-keg/Lineage-Detector/main/date-num.json?branchLabel=Spike%20mutations&f_userOrOld=highlighted%20sample
 
 Example for seqs 0-1000 at 7-10(referring to 7-6~7-9 seqs on GISAID)：
