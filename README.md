@@ -3,6 +3,7 @@ Tools for analysing usher results.
 
 ``des.json`` is lineage designations and is 
 downloaded from https://nextstrain.org/charon/getDataset?prefix=staging/nextclade/sars-cov-2/ .
+``curl -o des.json "https://nextstrain.org/charon/getDataset?prefix=staging/nextclade/sars-cov-2/"``
 It is used to tune some of the ill-defined branches on usher tree(usually caused by deletions) to their correct form.
 
 ``reference_seq.txt`` is SARS-Cov-2 reference seq.
