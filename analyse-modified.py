@@ -212,7 +212,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 							aa=table[this_seq[nuc_st-1:nuc_st+2]]
 							if aa!=old_aa:
 								# credible mutations: mutations on S, Orf9b, Orf9c, normal to O, or M to others
-								if (annoitem in ['S','ORF9b']) or (aa=='O') or (nuc_st==start):
+								if (annoitem in ['S','ORF9b','ORF3a']) or (aa=='O') or (nuc_st==start):
 									important_mut=True
 									if annoitem=='S' and not(n_glycan):
 										pot=40
@@ -440,14 +440,12 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 								important_mut = True
 						if int(m[3:].split("-")[1])>=anno[annoitem]['end'] and int(m[3:].split("-")[0])<=anno[annoitem]['end']:
 								important_mut = True
-				if int(m[3:].split("-")[1])>=anno['S']['start'] and int(m[3:].split("-")[0])<=anno['S']['end']:
-							important_mut = True
-				if int(m[3:].split("-")[1])>=anno['ORF9b']['start'] and int(m[3:].split("-")[0])<=anno['ORF9b']['end']:
-							important_mut = True
+				for annoitem in ['S','ORF9b','ORF3a']:
+					if int(m[3:].split("-")[1])>=anno[annoitem]['start'] and int(m[3:].split("-")[0])<=anno[annoitem]['end']:
+								important_mut = True
 			if m[0]=="i":
-				if int(m[3:].split(":")[0])>=anno['S']['start'] and int(m[3:].split(":")[0])<=anno['S']['end']:
-							important_mut = True
-				if int(m[3:].split(":")[0])>=anno['ORF9b']['start'] and int(m[3:].split(":")[0])<=anno['ORF9b']['end']:
+				for annoitem in ['S','ORF9b','ORF3a']:
+					if int(m[3:].split(":")[0])>=anno[annoitem]['start'] and int(m[3:].split(":")[0])<=anno[annoitem]['end']:
 							important_mut = True
 	if important_mut:
 		if is_terminal_lineage:
@@ -948,7 +946,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 						else:
 							imp_mut_dict.update({item.split(":")[0]:[item.split(":")[1],]})
 					for item in list(imp_mut_dict):
-						if item in ["S", "ORF9b"]:
+						if item in ["S", "ORF9b", "ORF3a"]:
 							important_mut=True
 						mutlist=imp_mut_dict[item]
 						idlist=[]
