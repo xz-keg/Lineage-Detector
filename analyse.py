@@ -14,7 +14,7 @@ important_country=args.important_ct_threshold
 filename=args.filename
 opt=args.output_highlighted
 deweighted_countries=["england",'scotland','wales','canada']
-highlighted_proteins=['S','Orf9b','Orf3a']
+highlighted_proteins=['S','ORF9b','ORF3a','Orf9b','Orf3a']
 
 def read_ref():
     ref=open("reference_seq.txt",'r')
