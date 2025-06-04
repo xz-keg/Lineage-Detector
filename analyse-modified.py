@@ -1036,7 +1036,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 							for j in range(len(idlist)):
 								if newidlist[i]==idlist[j]:
 									if "O" in mutlist[j]:
-										important_mut==True
+										important_mut=True
 									newmutlist.append(mutlist[j].replace("O","*"))													
 						imp_mut_dict[item]=",".join(newmutlist)
 						imp_mut_list.append(item+":"+",".join(newmutlist))
@@ -1152,15 +1152,27 @@ def designation_browser(current_node,current_mut):
 	name=current_node['name']
 	if (name.split(".",1)[0] in (["A", "B"]+list(alias))) and ("_" not in name) :
 		lin=name
+		linlist=[]
 		while lin !="A" and lin !="B":
 			if lin in ins_dic:
-				for item in ins_dic[lin].split(","):
-					if item not in all_mutations:
-						all_mutations.append(item)
+				linlist.append(lin)
 			if "." in lin:
 				lin=lin.rsplit(".",1)[0]
 			elif lin in list(alias):
 				lin = alias[lin]
+		linlist.reverse()
+		for lin in linlist:
+			for item in ins_dic[lin].split(","):
+				if item not in all_mutations:
+					existref=False
+					for i in range(len(all_mutations)):
+						if all_mutations[i][0]=="i":
+							if all_mutations[i][3:].split(":")[0]==item[3:].split(":")[0]:
+								if all_mutations[i][3:].split(":")[1]!=item[3:].split(":")[1]:
+									all_mutations[i]=item
+									existref=True
+					if not existref:
+						all_mutations.append(item)
 		variant_mutation_dic[name]=all_mutations
 	if 'children' in current_node:
 		for child in current_node['children']:
