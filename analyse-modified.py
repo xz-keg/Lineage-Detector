@@ -812,12 +812,13 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 									exists_del=False
 									idi = ids
 									for item2 in list(exmut_dict):
-										if item2[0]=="d":
-											ids=int(item2[3:].split("-")[0])
-											ide=int(item2[3:].split("-")[1])
-											if ide <= idi+9 and ids >= idi-8 and (ide-ids+1)==len(inserted):
-												exists_del = True
-												break
+										if item2 in list(print_exmut_dict):
+											if item2[0]=="d":
+												ids=int(item2[3:].split("-")[0])
+												ide=int(item2[3:].split("-")[1])
+												if ide <= idi+9 and ids >= idi-8 and (ide-ids+1)==len(inserted):
+													exists_del = True
+													break
 									if exists_del:
 										del print_exmut_dict[item2]
 										del print_exmut_dict[item]	
