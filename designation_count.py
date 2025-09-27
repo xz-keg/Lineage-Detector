@@ -16,6 +16,8 @@ all_count={}
 rcount={}
 ycount={}
 pcount={}
+
+
 def designation_browser(current_node,parent_mut,anno,current_ref):
     mut=[]
     all_mutations=[]
@@ -78,6 +80,8 @@ def read_designation():
     anno['ORF0']={'start':107,'end':136}
     ref=read_ref()
     sp=designation_browser(js['tree'],[],anno,ref)
+
     return 0
 read_designation() 
+
 print(ycount,rcount,pcount)
