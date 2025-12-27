@@ -29,7 +29,7 @@ Packages required:
 ``argparse``
 ``copy``
 
-Add highlighted lineage features to highlight samples with too many reversions, branches with additional undesignated Spike or Orf9b mutation, or branches with early stop signal/start codon destroyed. 
+Add highlighted lineage features to highlight samples with too many reversions, branches with additional undesignated Spike or Orf3a or Orf9b mutation, or branches with early stop signal/start codon destroyed. 
 
 Link to view important seqs on the most recent uploads (date replaced to the most recent date and num refers to number of seqs (1:0-1000, 2:1000-2000 etc)): 
 
@@ -42,6 +42,9 @@ Update on 2025-1-20: Add **Orf3a** as one of the default highlight proteins.
 Update on 2025-3-18: Change analysing period to **5 days** due to further reduced global sequencing.
 
 Update on 2025-4-20: Change analysing period to **7 days** due to further reduced global sequencing.
+
+Update on 2025-12-20: No longer use "complete" and "low coverage excluded" filter as they will ignore most BA.3.2 seqs.(due to mass deletion in BA.3.2)
+
 
 https://nextstrain.org/fetch/raw.githubusercontent.com/xz-keg/Lineage-Detector/main/date-num.json?branchLabel=Spike%20mutations&f_userOrOld=highlighted%20sample
 
