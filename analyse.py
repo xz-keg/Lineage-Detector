@@ -294,7 +294,7 @@ def designation_browser(current_node,current_mut):
     return 0
 
 def read_designation():
-    w=open("des.json",'r')
+    w=open("nextclade_sars-cov-2.json",'r')
     q=json.load(w)
     w.close()
     sp=designation_browser(q['tree'],[])
