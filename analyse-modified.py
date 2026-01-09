@@ -383,7 +383,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
 			ct = "China"
 		if ct == "Macao":
 			ct = "Macau"
-		if ct == "Crimea" or "Russia/40" in node['name'] or "Russia/43-CRIE" in node['name']:
+		if ct == "Crimea" or ct == "Donetsk" or ct == "Lugansk" or "Russia/40" in node['name'] or "Russia/43-CRIE" in node['name']:
 			ct = "Ukraine"
 		# if ct == "Kosovo":
 		# 	ct == "Serbia"
@@ -1063,29 +1063,28 @@ def read_alias():
 	w.close()
 	rev=dict()
 	for item in list(q):
-		if item !="A" and item !="B" and item[0] != "X":
+		if item !="A" and item !="B" and not ((item[0] == "X") and "." not in item):
 			rev.update({q[item]:item})
 	alias=dict()	
 	for item in list(q):
 		if item !="A" and item !="B" and item[0] != "X":
 			temp=q[item].rsplit(".",3)
-			if temp[0] !="A" and temp[0] !="B" and temp[0][0] != "X":
+			if temp[0] !="A" and temp[0] !="B" and not ((temp[0][0] == "X") and "." not in temp[0]):
 				alias.update({item:rev[temp[0]]+"."+".".join(temp[1:])})
 			else:
 				alias.update({item:q[item]})
 		elif item[0] == "X":
-			temp1=q[item][0].removesuffix("*")+"."
-			temp2=q[item][1].removesuffix("*")+"."
-			while temp1.split(".",1)[0] != "A" and temp1.split(".",1)[0] != "B":
-				temp1=alias[temp1.split(".",1)[0]]+"."+temp1.split(".",1)[1]
-			while temp2.split(".",1)[0] != "A" and temp2.split(".",1)[0] != "B":
-				temp2=alias[temp2.split(".",1)[0]]+"."+temp2.split(".",1)[1]
+			don = list(set(q[item]))
+			for j in range(len(don)):
+				don[j]=don[j].removesuffix("*")+"."
+				while don[j].split(".",1)[0] != "A" and don[j].split(".",1)[0] != "B":
+					don[j]=alias[don[j].split(".",1)[0]]+"."+don[j].split(".",1)[1]
 			temp=""
 			i=0
-			while temp1.split(".")[i]==temp2.split(".")[i]:
-				temp+=("."+temp1.split(".")[i])
+			while all(don[0].split(".")[i]==don[k].split(".")[i] for k in range(1,len(don))):
+				temp+=("."+don[0].split(".")[i])
 				i+=1
-				if i == len(temp1) or i == len(temp2):
+				if i == min(len(don[k]) for k in range(len(don))):
 					break
 			temp=temp[1:]
 			while len(temp.split("."))%3!=0:
@@ -1154,9 +1153,12 @@ def designation_browser(current_node,current_mut):
 	if (name.split(".",1)[0] in (["A", "B"]+list(alias))) and ("_" not in name) :
 		lin=name
 		linlist=[]
+		BA_3_2=False
 		while lin !="A" and lin !="B":
 			if lin in ins_dic:
 				linlist.append(lin)
+			if lin=="BA.3.2":
+				BA_3_2=True
 			if "." in lin:
 				lin=lin.rsplit(".",1)[0]
 			elif lin in list(alias):
@@ -1174,6 +1176,20 @@ def designation_browser(current_node,current_mut):
 									existref=True
 					if not existref:
 						all_mutations.append(item)
+		if BA_3_2:
+			for i in range(len(all_mutations)):
+				if all_mutations[i][0]!="i":
+					if int(all_mutations[i][1:-1]) in range(27380,28251):
+						all_mutations[i]=all_mutations[i][:-1]+"-"
+			for id in range(27380,28251):
+				if ref[id-1]+str(id)+"-" not in all_mutations:
+					all_mutations.append(ref[id-1]+str(id)+"-")
+			for id in range(27360,27380):
+				if ref[id-1]+str(id)+"-" in all_mutations:
+					all_mutations.remove(ref[id-1]+str(id)+"-")
+			for id in range(28251,28271):
+				if ref[id-1]+str(id)+"-" in all_mutations:
+					all_mutations.remove(ref[id-1]+str(id)+"-")
 		variant_mutation_dic[name]=all_mutations
 	if 'children' in current_node:
 		for child in current_node['children']:
