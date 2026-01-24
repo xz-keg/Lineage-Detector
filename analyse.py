@@ -97,6 +97,7 @@ def highlight_browser(node):
         for child in node['children']:
             highlight_browser(child)
     return 0
+
 def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
     lineage=''
     if 'pango_lineage_usher' in node['node_attrs']:
@@ -126,6 +127,7 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
     
     if lineage in variant_mutation_dic:
         designated_mutations=variant_mutation_dic[lineage]
+    
     lineage_ref=ref
     for item in designated_mutations:
         ids=int(item[1:-1])
@@ -291,16 +293,18 @@ def designation_browser(current_node,current_mut):
         for child in current_node['children']:
             w=designation_browser(child,all_mutations)
 
+
     return 0
 
 def read_designation():
-    w=open("nextclade_sars-cov-2.json",'r')
+    w=open("des.json",'r')
     q=json.load(w)
     w.close()
     sp=designation_browser(q['tree'],[])
     return 0
 read_designation() 
-#print(len(variant_mutation_dic))
+#for item in variant_mutation_dic:
+#    print(item)
 
 f=open(filename+".json",'r')
 js=json.load(f)
