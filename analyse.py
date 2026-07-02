@@ -214,6 +214,10 @@ def node_browser(node,current_lineage,current_seq,mutation_from_last,backcount):
             country_list.append(ct)
         if 'GBW' in node['name']:
             country_list.append('GBW')
+        if 'PRM' in node['name']:
+            country_list.append('PRM') 
+        if 'EIS' in node['name']:
+            country_list.append('EIS')
         date=node['name'].split('|')[-1]
         date_list.append(date)
         
