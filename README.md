@@ -47,6 +47,8 @@ Update on 2025-12-20: No longer use "complete" and "low coverage excluded" filte
 
 Update on 2026-5-12: Change analysing period to **10 days** due to mass reduced global sequencing.
 
+Update on 2026-9-14: Change analysing period to **14 days** due to mass reduced global sequencing.
+
 
 https://nextstrain.org/fetch/raw.githubusercontent.com/xz-keg/Lineage-Detector/main/date-num.json?branchLabel=Spike%20mutations&f_userOrOld=highlighted%20sample
 
